@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="URL을 간편하게 고화질 QR코드로 변환하고 JPG 파일로 즉시 다운로드할 수 있는 QR코드 생성 서비스입니다.">
+  <title>QR 코드 생성기 | 쉽고 빠른 QR코드 다운로드</title>
+  
+  <!-- Pretendard Font & Remix Icon (깔끔한 UI 아이콘) -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" />
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 배경 데코레이션 앰비언트 글로우 & 마우스 인터랙티브 스포트라이트 -->
+  <div class="cursor-spotlight" id="cursor-spotlight" aria-hidden="true"></div>
+  <div class="ambient-glow glow-top-right" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom-left" aria-hidden="true"></div>
+  <div class="ambient-glow glow-center" aria-hidden="true"></div>
+
+  <!-- 상단 네비게이션 헤더 (좌측 로고) -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#" id="brand-logo-link" class="logo-container" title="처음으로 돌아가기">
+        <img src="img/logo.png" alt="URL2QR 로고" class="logo-image" id="app-logo">
+      </a>
+    </div>
+  </header>
+
+  <!-- 메인 영역 -->
+  <main class="app-main" id="app-main">
+    
+    <!-- 1. 정중앙 QR코드 표시 영역 (초기에는 숨겨짐, 생성 시 정중앙에 표시) -->
+    <section class="qr-result-section" id="qr-result-section" aria-live="polite">
+      <div class="qr-card-container">
+        
+        <!-- QR 코드 카드 (클릭 시 다운로드) -->
+        <div class="qr-card" id="qr-card" role="button" tabindex="0" title="클릭하여 JPG로 다운로드">
+          <div class="qr-preview-wrapper" id="qr-code-display">
+            <!-- QR코드가 동적으로 삽입되는 영역 -->
+          </div>
+
+          <!-- 호버 시 나타나는 다운로드 오버레이 안내 -->
+          <div class="qr-hover-overlay" aria-hidden="true">
+            <div class="overlay-content">
+              <i class="ri-download-2-line overlay-icon"></i>
+              <span class="overlay-text">JPG 다운로드</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR 카드 하단 안내 및 빠른 액션 -->
+        <div class="qr-meta-info">
+          <p class="qr-tip-badge">
+            <i class="ri-cursor-line"></i> QR코드를 클릭하면 JPG 파일로 저장됩니다
+          </p>
+          <div class="qr-url-chip" id="qr-url-chip" title="생성된 URL">
+            <i class="ri-link"></i>
+            <span class="url-text" id="target-url-display">https://example.com</span>
+          </div>
+          
+          <div class="qr-actions">
+            <button type="button" class="action-btn download-direct-btn" id="download-direct-btn" title="JPG 다운로드">
+              <i class="ri-download-cloud-2-line"></i> JPG 다운로드
+            </button>
+            <button type="button" class="action-btn copy-url-btn" id="copy-url-btn" title="URL 복사">
+              <i class="ri-file-copy-line"></i> URL 복사
+            </button>
+            <button type="button" class="action-btn new-qr-btn" id="new-qr-btn" title="새로 만들기">
+              <i class="ri-refresh-line"></i> 새로 만들기
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. URL 입력 섹션 (초기에는 정중앙, 확인 누르면 하단으로 부드럽게 이동) -->
+    <section class="input-stage-section" id="input-stage-section">
+      <div class="input-card">
+        
+        <!-- 중앙에 있을 때 표시되는 인트로 타이틀 -->
+        <div class="intro-headline" id="intro-headline">
+          <div class="hero-badge">Fast & Easy QR Creator</div>
+          <h1 class="hero-title">URL을 입력하고<br><span class="gradient-text">QR코드를 생성</span>하세요</h1>
+          <p class="hero-subtitle">입력 후 확인을 누르면 바로 다운로드 가능한 고화질 QR코드가 생성됩니다.</p>
+        </div>
+
+        <!-- 인터랙티브 URL 인풋 폼 -->
+        <form class="url-form" id="url-form" onsubmit="return false;">
+          <div class="input-wrapper" id="input-wrapper">
+            <span class="input-prefix-icon" aria-hidden="true">
+              <i class="ri-links-line"></i>
+            </span>
+            <input 
+              type="text" 
+              id="url-input" 
+              class="url-input" 
+              placeholder="https:// 또는 웹사이트 주소를 입력하세요" 
+              autocomplete="off" 
+              spellcheck="false" 
+              required
+              aria-label="생성할 URL 입력"
+            >
+            <button type="button" class="clear-input-btn" id="clear-input-btn" aria-label="입력 내용 지우기" style="display: none;">
+              <i class="ri-close-circle-fill"></i>
+            </button>
+            <button type="submit" class="submit-btn" id="submit-btn" aria-label="QR코드 생성 확인">
+              <span class="btn-text">확인</span>
+              <i class="ri-arrow-right-line btn-icon"></i>
+            </button>
+          </div>
+          <p class="input-helper-msg" id="input-helper-msg"></p>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 토스트 알림 메시지 컴포넌트 -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- 라이브러리 및 스크립트 로드 -->
+  <script src="js/qrcode.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
